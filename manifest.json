@@ -1,0 +1,11 @@
+{
+    "name": "GiHar: Aplikasi Simulasi Gitar Harmoni Chord",
+    "short_name": "GiHar",
+    "description": "Mainkan gitar kapan saja dengan GiHar! Simulasi gitar harmoni & chord akurat",
+    "icons": "gihar-favicon.jpg",
+    "theme_color": "#2D2D2D",
+    "background_color": "#2D2D2D",
+    "display": "standalone",
+    "start_url": "./index.html",
+    "orientation": "portrait"
+}
