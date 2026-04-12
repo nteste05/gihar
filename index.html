@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="canonical" href="https://nteste05.github.io/gihar/" />
+    <link rel="icon" type="image/jpg" href="gihar-favicon.jpg" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="gihar-favicon.jpg">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>GiHar: Aplikasi Simulasi Gitar Harmoni Chord</title>
+    <meta name="description" content="Mainkan gitar kapan saja dengan GiHar! Simulasi gitar harmoni & chord akurat, fitur Smart Harmony, suara HD, dan latensi rendah. Belajar gitar jadi lebih mudah!">
+    <meta name="keywords" content="aplikasi simulasi gitar, belajar chord gitar, gitar harmoni, kunci gitar lengkap, simulator gitar akustik, belajar musik pemula, progresi chord, main gitar di HP, aplikasi GiHar, alat musik digital">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nteste05.github.io/gihar">
+    <meta property="og:title" content="GiHar: Aplikasi Simulasi Gitar Harmoni Chord">
+    <meta property="og:description" content="Mainkan gitar kapan saja dengan GiHar! Simulasi gitar harmoni & chord akurat, fitur Smart Harmony, suara HD, dan latensi rendah. Belajar gitar jadi lebih mudah!">
+    <meta property="og:image" content="https://raw.githubusercontent.com/nteste05/gihar/refs/heads/main/gihar-thumb.jpg">
+    
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nteste05.github.io/gihar">
+    <meta property="twitter:title" content="GiHar: Aplikasi Simulasi Gitar Harmoni Chord">
+    <meta property="twitter:description" content="Mainkan gitar kapan saja dengan GiHar! Simulasi gitar harmoni & chord akurat, fitur Smart Harmony, suara HD, dan latensi rendah. Belajar gitar jadi lebih mudah!">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/nteste05/gihar/refs/heads/main/gihar-thumb.jpg">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px;
+            background: #121212;
+            color: #eee;
+            margin: 0;
+            
+        }
+        .controls {
+            padding: 10px 0;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            align-items: center;
+            margin: 0;
+        }
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+            
+        }
+        button {
+            padding: 15px 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            transition: 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-major { background: #d35400; box-shadow: 0 4px #a04000; }
+        .btn-minor { background: #2980b9; box-shadow: 0 4px #1c5982; }
+        .chromatic { filter: brightness(0.75); }
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px #000;
+        }
+        
+        .rec-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .rec-controls button {
+            font-size: 12px;
+            padding: 10px;
+            background: #555;
+            box-shadow: 0 3px #333;
+        }
+        .rec-controls button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px #000;
+        }
+        #btnRecord.recording {
+            background: #ff4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        /* --- NAVIGATION & SIDEBAR --- */
+        .navbar {
+            
+            color: white;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 0 10px 0 0;
+        }
+
+        header h1 {
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            margin:0;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            background-color: #1a1a1a;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 10px;
+        }
+
+        .sidebar a {
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            color: #ccc;
+            display: block;
+            transition: 0.2s;
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar a:hover {
+            color: #ffc107;
+            background-color: #222;
+        }
+
+        .sidebar .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 36px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .overlaynav {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1500;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 10px;
+            font-size: 0.9rem;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <!-- Sidebar Menu -->
+    <div id="mySidebar" class="sidebar">
+        <span class="close-btn" onclick="closeNav()">&times;</span>
+        <a href="https://nteste05.github.io/gemii/" onclick="closeNav()">👽 Lainnya</a>
+    </div>
+    <!-- Overlay Background -->
+    <div id="overlaynav" class="overlaynav" onclick="closeNav()"></div>
+    <nav class="navbar">
+        <button class="menu-btn" onclick="openNav()">&#9776;</button>
+        <header><h1>GiHar: Gitar Harmoni</h1></header>
+        <p class="visually-hidden">GiHar: Revolusi Simulasi Gitar Harmoni & Chord dalam Genggaman Anda<br><br>Apakah Anda ingin belajar gitar tetapi belum memiliki instrumen fisik? Atau mungkin Anda seorang musisi berpengalaman yang membutuhkan alat praktis untuk menyusun progresi chord di mana saja? Perkenalkan<strong>GiHar (Gitar Harmoni)</strong>, aplikasi simulasi gitar revolusioner yang dirancang untuk menghadirkan pengalaman bermain musik yang autentik, intuitif, dan edukatif langsung dari perangkat Android atau iOS Anda.</p>
+        <p class="visually-hidden">GiHar bukan sekadar <strong>aplikasi simulasi gitar</strong> biasa. Ini adalah ekosistem digital bagi pecinta musik yang fokus pada kedalaman harmoni dan akurasi chord. Dengan teknologi pemrosesan audio terkini, GiHar menghasilkan suara gitar yang jernih, mulai dari dentuman acoustic steel yang hangat hingga distorsi electric guitar yang gahar.</p>
+        <p class="visually-hidden">Keunggulan Teknis. Grafis HD: Tampilan chord gitar yang realistis memberikan pengalaman visual yang memanjakan mata. Mode Rekam: Rekam sesi latihan atau komposisi lagu Anda dalam format audio berkualitas tinggi. Ringan & Hemat Baterai: Meski memiliki fitur canggih, GiHar dirancang agar tetap ringan dijalankan di smartphone spesifikasi menengah.</p>
+        <p class="visually-hidden"><strong>GiHar (Gitar Harmoni & Chord)</strong> adalah solusi all-in-one bagi siapa saja yang ingin mendalami dunia gitar tanpa batas ruang dan waktu. Baik Anda ingin berlatih lagu favorit, belajar teori harmoni, atau sekadar melepas penat dengan bermusik, GiHar siap menjadi teman setia Anda.</p>
+    </nav>
+    </div>
+
+    <div class="controls">
+        <label>Pilih Suara:</label>
+        <select id="soundMode">
+            <option value="clean">Weird Clean</option>
+            <option value="acoustic">Weird Acoustic</option>
+            <option value="distor">Smooth Distortion</option>
+        </select>
+        
+    </div>
+    
+    <div class="rec-controls">
+            <button id="btnRecord">Rekam</button>
+            <button id="btnStop" disabled>Berhenti</button>
+            <button id="btnPlay" disabled>Putar</button>
+            <button id="btnSave" disabled>Simpan</button>
+        </div>
+
+    <div id="ui-board" class="board"></div>
+    
+    <footer>
+        <p>&copy; 2026 <a style="color: inherit; text-decoration: none;" href="https://nteste05.github.io/gihar">GiHar: Aplikasi Simulasi Gitar Harmoni Chord.</a> <br> 
+        <small>Konten ini hanya untuk tujuan hiburan.</small>
+        </p>
+    </footer>
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Node khusus untuk menangkap aliran audio (Recording Stream)
+        const dest = audioCtx.createMediaStreamDestination();
+        
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioUrl = null;
+        
+        const freqTable = {
+            'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13, 
+            'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00, 
+            'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
+        };
+
+        const baseNotes = Object.keys(freqTable);
+        const board = document.getElementById('ui-board');
+        const soundMode = document.getElementById('soundMode');
+        
+        // UI Recording Elements
+        const btnRecord = document.getElementById('btnRecord');
+        const btnStop = document.getElementById('btnStop');
+        const btnPlay = document.getElementById('btnPlay');
+        const btnSave = document.getElementById('btnSave');
+
+        // Fungsi membuat kurva Distortion (Sigmoid Curve) agar tidak rebek
+        function makeDistortionCurve(amount) {
+            const k = typeof amount === 'number' ? amount : 50;
+            const n_samples = 44100;
+            const curve = new Float32Array(n_samples);
+            const deg = Math.PI / 180;
+            for (let i = 0; i < n_samples; ++i) {
+                const x = i * 2 / n_samples - 1;
+                curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
+            }
+            return curve;
+        }
+
+        const distCurve = makeDistortionCurve(400);
+
+        baseNotes.forEach(note => {
+            createBtn(note, 'major');
+            createBtn(note + 'm', 'minor');
+        });
+
+        function createBtn(label, type) {
+            const btn = document.createElement('button');
+            btn.innerText = label;
+            btn.className = type === 'major' ? 'btn-major' : 'btn-minor';
+            if (label.includes('#')) btn.classList.add('chromatic');
+            btn.onclick = () => playChord(label);
+            board.appendChild(btn);
+        }
+
+        function playChord(chordName) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const isMinor = chordName.endsWith('m');
+            const rootName = isMinor ? chordName.slice(0, -1) : chordName;
+            const rootFreq = freqTable[rootName];
+            const intervals = isMinor ? [0, 3, 7, 12] : [0, 4, 7, 12]; 
+            const now = audioCtx.currentTime;
+            const mode = soundMode.value;
+
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(mode === 'distor' ? 0.3 : 0.5, now);
+            
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = "lowpass";
+            filter.frequency.value = mode === 'distor' ? 2500 : 8000;
+
+            const distortion = audioCtx.createWaveShaper();
+            distortion.curve = distCurve;
+            distortion.oversample = '4x';
+
+            // KONEKSI: Output dikirim ke Speaker (audioCtx.destination) DAN Recorder (dest)
+            if (mode === 'distor') {
+                masterGain.connect(distortion);
+                distortion.connect(filter);
+            } else {
+                masterGain.connect(filter);
+            }
+            
+            filter.connect(audioCtx.destination);
+            filter.connect(dest); // Mengirim audio ke MediaRecorder
+
+            intervals.forEach((interval, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const freq = rootFreq * Math.pow(2, interval / 12);
+
+                if (mode === 'distor') {
+                    osc.type = 'sawtooth';
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.2, now + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                } else if (mode === 'clean') {
+                    osc.type = 'triangle';
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.4, now + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                } else {
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                }
+
+                osc.frequency.setValueAtTime(freq, now);
+                osc.connect(gain);
+                gain.connect(masterGain);
+
+                const strumDelay = i * 0.025;
+                osc.start(now + strumDelay);
+                osc.stop(now + 1.5);
+            });
+        }
+        
+        // --- LOGIKA REKAMAN ---
+        btnRecord.onclick = () => {
+            audioChunks = [];
+            mediaRecorder = new MediaRecorder(dest.stream);
+            
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) audioChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                audioUrl = URL.createObjectURL(audioBlob);
+                btnPlay.disabled = false;
+                btnSave.disabled = false;
+            };
+
+            mediaRecorder.start();
+            btnRecord.disabled = true;
+            btnRecord.classList.add('recording');
+            btnStop.disabled = false;
+        };
+
+        btnStop.onclick = () => {
+            mediaRecorder.stop();
+            btnRecord.disabled = false;
+            btnRecord.classList.remove('recording');
+            btnStop.disabled = true;
+        };
+
+        btnPlay.onclick = () => {
+            if (audioUrl) {
+                const audio = new Audio(audioUrl);
+                audio.play();
+            }
+        };
+
+        btnSave.onclick = () => {
+            if (audioUrl) {
+                const link = document.createElement('a');
+                link.href = audioUrl;
+                link.download = 'my-chord-track.webm';
+                link.click();
+            }
+        };
+        
+        const sidebar = document.getElementById("mySidebar");
+    const overlaynav = document.getElementById("overlaynav");
+        
+        function openNav() {
+            sidebar.style.width = "280px";
+            overlaynav.style.display = "block";
+            // Mencegah scroll pada body saat menu buka
+            document.body.style.overflow = "hidden";
+        }
+        
+        function closeNav() {
+            sidebar.style.width = "0";
+            overlaynav.style.display = "none";
+            // Mengembalikan scroll body
+            document.body.style.overflow = "auto";
+        }
+    </script>
+</body>
+</html>
